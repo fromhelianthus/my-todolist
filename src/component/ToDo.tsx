@@ -4,14 +4,11 @@ import { Categories, IToDo, toDoState } from "../atoms";
 
 function ToDo({ text, category, id }: IToDo) {
     const setToDos = useSetRecoilState(toDoState);
-    const onClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        const {
-            currentTarget: { name },
-        } = event;
+
+    const onClick = (newCategory: string) => {
         setToDos((oldToDos) => {
-            // findIndex()
             const targetIndex = oldToDos.findIndex((toDo) => toDo.id === id);
-            const newToDo = { text, id, category: name as any };
+            const newToDo = { text, id, category: newCategory };
             return [
                 ...oldToDos.slice(0, targetIndex),
                 newToDo,
@@ -19,23 +16,18 @@ function ToDo({ text, category, id }: IToDo) {
             ];
         });
     };
+
     return (
         <li>
             <span>{text}</span>
             {category !== Categories.TO_DO && (
-                <button name={Categories.TO_DO} onClick={onClick}>
-                    To Do
-                </button>
+                <button onClick={() => onClick(Categories.TO_DO)}>To Do</button>
             )}
             {category !== Categories.DOING && (
-                <button name={Categories.DOING} onClick={onClick}>
-                    Doing
-                </button>
+                <button onClick={() => onClick(Categories.DOING)}>Doing</button>
             )}
             {category !== Categories.DONE && (
-                <button name={Categories.DONE} onClick={onClick}>
-                    Done
-                </button>
+                <button onClick={() => onClick(Categories.DONE)}>Done</button>
             )}
         </li>
     );

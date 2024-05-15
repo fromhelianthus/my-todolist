@@ -12,6 +12,7 @@ function ToDoList() {
       <CreateToDo />
       <ul>
         {toDos.map((toDo) => (
+          // <ToDo text={toDo.text} id={toDo.id category={toDo.category}} />
           <ToDo key={toDo.id} {...toDo} />
         ))}
       </ul>

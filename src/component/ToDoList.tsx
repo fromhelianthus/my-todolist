@@ -1,21 +1,44 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { Categories, categoryState, toDoSelector } from "../atoms";
+import {
+    Categories,
+    categoryState,
+    selectedCategoryState,
+    toDoSelector,
+} from "../atoms";
 import CreateToDo from "./CreateToDo";
 import ToDo from "./ToDo";
 
 function ToDoList() {
     const toDos = useRecoilValue(toDoSelector);
-    const [category, setCategory] = useRecoilState(categoryState);
+    const [categories, setCategories] = useRecoilState(categoryState);
+    const [selectedCategory, setSelectedCategory] = useRecoilState(
+        selectedCategoryState
+    );
     const [newCategory, setNewCategory] = useState("");
 
+    // 컴포넌트가 처음 로드될 때 localStorage에서 사용자 카테고리를 불러오기
+    useEffect(() => {
+        const savedCategories = localStorage.getItem("userCategories");
+        if (savedCategories) {
+            setCategories((prev) => [...prev, ...JSON.parse(savedCategories)]);
+        }
+    }, [setCategories]);
+
+    // 카테고리 선택 변경
     const onInput = (event: React.FormEvent<HTMLSelectElement>) => {
-        setCategory(event.currentTarget.value as any);
+        setSelectedCategory(event.currentTarget.value);
     };
 
+    // 새로운 카테고리 추가 및 localStorage에 저장
     const handleNewCategory = () => {
-        if (newCategory && !Object.values(Categories).includes(newCategory)) {
-            setCategory(newCategory as any);
+        if (newCategory && !categories.includes(newCategory)) {
+            const updatedCategories = [...categories, newCategory];
+            setCategories(updatedCategories);
+            localStorage.setItem(
+                "userCategories",
+                JSON.stringify(updatedCategories)
+            );
             setNewCategory("");
         }
     };
@@ -24,10 +47,12 @@ function ToDoList() {
         <div>
             <h1>To Do List</h1>
             <hr />
-            <select value={category} onInput={onInput}>
-                <option value={Categories.TO_DO}>To Do</option>
-                <option value={Categories.DOING}>Doing</option>
-                <option value={Categories.DONE}>Done</option>
+            <select value={selectedCategory} onInput={onInput}>
+                {categories.map((category) => (
+                    <option key={category} value={category}>
+                        {category}
+                    </option>
+                ))}
             </select>
             <br />
             <input
